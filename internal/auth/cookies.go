@@ -4,6 +4,7 @@ import(
 	"encoding/json"
 	"os"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 const cookieFile = "cookies.json"
@@ -20,11 +21,25 @@ func LoadCookies(page *rod.Page) bool {
 		return false
 	}
 
-	var cookies []*rod.Cookie
-	if err := json.Unmarshal(data, &cookies); err != nil {
+	var storedCookies []*proto.NetworkCookie
+	if err := json.Unmarshal(data, &storedCookies); err != nil {
 		return false
 	}
 
-	page.MustSetCookies(cookies...)
+	var params []*proto.NetworkCookieParam
+	for _, c := range storedCookies {
+		params = append(params, &proto.NetworkCookieParam{
+			Name:     c.Name,
+			Value:    c.Value,
+			Domain:   c.Domain,
+			Path:     c.Path,
+			Expires:  c.Expires,
+			HTTPOnly: c.HTTPOnly,
+			Secure:   c.Secure,
+			SameSite: c.SameSite,
+		})
+	}
+
+	page.MustSetCookies(params...)
 	return true
 }
