@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/paragraph1148/linkedin-automation/internal/auth"
 	"github.com/paragraph1148/linkedin-automation/internal/browser"
+	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
 
 func main() {
@@ -29,4 +30,7 @@ func main() {
 
 	page.MustNavigate("https://www.linkedin.com/feed")
 	page.MustWaitLoad()
+
+	stealth.RandomScroll(page)
+	stealth.RandomMouseMove(page)
 }

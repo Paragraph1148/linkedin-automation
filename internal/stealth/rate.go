@@ -21,7 +21,7 @@ func CanPerformAction() error {
 	var count int
 
 	if parts != "" {
-		fmt.Sscanf(parts, "&s &d", &savedDate &count)
+		fmt.Sscanf(parts, "&s &d", &savedDate, &count)
 	}
 
 	if savedDate != today {
