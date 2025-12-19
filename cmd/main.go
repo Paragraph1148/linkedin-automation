@@ -15,10 +15,17 @@ func main() {
 	}
 	defer b.Close()
 
-	page := b.MustPage("https://google.com")
+	page := b.MustPage()
+	if !auth.LoadCookies(page) {
+		log.Println("No cookies found, logging in")
+		if err := auth.Login(page); err != nil {
+			log.Fatal(err)
+		}
+		auth.SaveCookies(page)
+	} else {
+		log.Println("loaded cookies, skipping login")
+	}
+
+	page.MustNavigate("https://www.linkedin.com/feed")
 	page.MustWaitLoad()
-
-	log.Println("Opened Google successfully")
-
-	select {}
 }
