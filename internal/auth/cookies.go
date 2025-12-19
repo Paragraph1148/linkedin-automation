@@ -20,7 +20,7 @@ func LoadCookies(page *rod.Page) bool {
 		return false
 	}
 
-	var cookies []*rod.cookie
+	var cookies []*rod.Cookie
 	if err := json.Unmarshal(data, &cookies); err != nil {
 		return false
 	}
