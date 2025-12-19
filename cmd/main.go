@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"github.com/joho/godotenv"
+	"github.com/paragraph1148/linkedin-automation/internal/auth"
 	"github.com/paragraph1148/linkedin-automation/internal/browser"
 )
 
