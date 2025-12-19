@@ -1,6 +1,7 @@
 package stealth
 
 import (
+	"fmt"
 	"errors"
 	"os"
 	"strconv"

@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 	"github.com/go-rod/rod"
+	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
 
 func Login(page *rod.Page) error {
@@ -18,10 +19,14 @@ func Login(page *rod.Page) error {
 	page.MustNavigate("https://www.linkedin.com/login")
 	page.MustWaitLoad()
 
-	page.MustElement(`input[name="session_key"]`).
-		MustInput(password)
-	time.Sleep(800 * time.Millisecond)
+	emailEl := page.MustElement(`input[name="session_key"]`)
+	stealth.HumanType(emailEl, email)
+	stealth.RandomDelay(500, 1200)
 
+	passwordEl := page.MustElement(`input[name="session_password]`)
+	stealth.HumanType(passwordEl, password)
+	stealth.RandomDelay(500, 1200)
+	
 	page.MustElement(`button[type="submit"]`).
 		MustClick()
 	page.MustWaitLoad()
