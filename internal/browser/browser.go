@@ -3,7 +3,7 @@ package browser
 import (
 	"log"
 	"github.com/go-rod/rod"
-	"github.com/go-rod/lib/launcher"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 func LaunchBrowser() (*rod.Browser, error) {
