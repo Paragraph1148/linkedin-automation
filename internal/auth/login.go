@@ -32,6 +32,8 @@ func Login(page *rod.Page) error {
 	page.MustElement(`button[type="submit"]`).
 		MustClick()
 	page.Timeout(15 * time.Second).MustWaitLoad()
+	
+	page.MustScreenshot("after_login.png")
 
 	url := page.MustInfo().URL
 	log.Println("Post-login URL:", url)
@@ -40,8 +42,6 @@ func Login(page *rod.Page) error {
 		log.Println("LinkedIn checkpoint detected - stopping automation")
 		return errors.New("checkpoint detected")
 	}
-
-	page.MustScreenshot("after_login.png")
 
 	return nil
 }
