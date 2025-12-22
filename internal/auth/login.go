@@ -31,7 +31,7 @@ func Login(page *rod.Page) error {
 
 	page.MustElement(`button[type="submit"]`).
 		MustClick()
-	page.Timeout(15 * time.Second).MustWaitLoad()a
+	page.Timeout(15 * time.Second).MustWaitLoad()
 
 	url := page.MustInfo().URL
 	log.Println("Post-login URL:", url)
