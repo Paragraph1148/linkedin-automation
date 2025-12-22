@@ -7,7 +7,6 @@ import (
 	"log"
 	"strings"
 	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/proto"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
 
@@ -26,13 +25,13 @@ func Login(page *rod.Page) error {
 	stealth.HumanType(emailEl, email)
 	stealth.RandomDelay(500, 1200)
 
-	passwordEl := page.MustElement(`input[name="session_password]`)
+	passwordEl := page.MustElement(`input[name="session_password"]`)
 	stealth.HumanType(passwordEl, password)
 	stealth.RandomDelay(500, 1200)
 
 	page.MustElement(`button[type="submit"]`).
 		MustClick()
-	page.Timeout(15 * time.Second).MustWaitLoad()
+	page.Timeout(15 * time.Second).MustWaitLoad()a
 
 	url := page.MustInfo().URL
 	log.Println("Post-login URL:", url)
@@ -42,7 +41,7 @@ func Login(page *rod.Page) error {
 		return errors.New("checkpoint detected")
 	}
 
-	buf := page.MustScreenshot(false, &proto.PageCaptureScreenshot{})
-	_ = os.WriteFile("after_login.png", buf, 0644)
+	page.MustScreenshot("after_login.png")
+
 	return nil
 }

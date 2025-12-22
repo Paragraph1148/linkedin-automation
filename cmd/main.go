@@ -6,6 +6,7 @@ import (
 	"github.com/paragraph1148/linkedin-automation/internal/auth"
 	"github.com/paragraph1148/linkedin-automation/internal/browser"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
+	"github.com/paragraph1148/linkedin-automation/internal/search"
 )
 
 func main() {
@@ -31,6 +32,15 @@ func main() {
 	page.MustNavigate("https://www.linkedin.com/feed")
 	page.MustWaitLoad()
 
+	query := search.SearchQuery{
+		Keywords: "Software Engineer",
+		Page: 0,
+	}
+	page.MustNavigate(query.URL())
+	page.MustWaitLoad()
+	
 	stealth.RandomScroll(page)
 	stealth.RandomMouseMove(page)
+
+	
 }
