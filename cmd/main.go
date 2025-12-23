@@ -32,6 +32,11 @@ func main() {
 	page.MustNavigate("https://www.linkedin.com/feed")
 	page.MustWaitLoad()
 
+	if err := auth.EnsureAuthenticated(page); err != nil {
+		log.Println("Auth guard triggered:", err)
+		return
+	}
+
 	query := search.SearchQuery{
 		Keywords: "Software Engineer",
 		Page: 0,

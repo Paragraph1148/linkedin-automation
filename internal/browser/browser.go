@@ -10,9 +10,11 @@ func LaunchBrowser() (*rod.Browser, error) {
 	log.Println("Launching Rod-managed Chromium (headless, no sandbox)")
 
 	u := launcher.New().
-		Headless(true).
+		Headless(false).
 		NoSandbox(true).
 		Leakless(false).
+		Set("ozone-platform", "wayland").
+		Set("enable-features", "UseOzonePlatform").
 		MustLaunch()
 
 	browser := rod.New().ControlURL(u)
