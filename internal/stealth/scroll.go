@@ -4,15 +4,15 @@ import (
 	"math/rand"
 	"time"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/input"
 )
 
 func RandomScroll(page *rod.Page) {
-	scrollCount := rand.Intn(3) + 2
+	scrolls := rand.Intn(3) + 2
 
-	for i := 0; i < scrollCount; i++ {
-		page.MustEval(`
-			car distance = Math.floor(Math.random() * 400) + 200;
-			window.scrollBy(0, distance)`)
+	for i := 0; i < scrolls; i++ {
+		page.Keyboard.Press(input.PageDown)
+
 		time.Sleep(time.Duration(400+rand.Intn(800)) * time.Millisecond)
 	}
 }
