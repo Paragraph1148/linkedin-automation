@@ -19,6 +19,21 @@ func main() {
 	defer b.Close()
 
 	page := b.MustPage()
+
+	if useMock {
+		log.Println("Running in mock mode")
+		if err := search.LoadMockHTML(page, "testdata/search_mock.html"); err != nil {
+			log.Fatal(err)
+		}
+		profiles, err := search.ExtractProfileURLs(page)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Mock profiles found:", len(profiles))
+		search.SaveProfiles(profiles, "profiles_mock.json")
+		return
+	}
+
 	if !auth.LoadCookies(page) {
 		log.Println("No cookies found, logging in")
 		if err := auth.Login(page); err != nil {
@@ -34,6 +49,7 @@ func main() {
 
 	if err := auth.EnsureAuthenticated(page); err != nil {
 		log.Println("Auth guard triggered:", err)
+		page.MustScreenshot("after_login.png")
 		return
 	}
 
@@ -41,11 +57,23 @@ func main() {
 		Keywords: "Software Engineer",
 		Page: 0,
 	}
+	log.Println("Navigating to search URL:", query.URL())
+
 	page.MustNavigate(query.URL())
 	page.MustWaitLoad()
 	
 	stealth.RandomScroll(page)
 	stealth.RandomMouseMove(page)
 
+	profiles, err := search.ExtractProfileURLs(page)
+	if err != nil {
+		log.Println("Profile extraction failed:", err)
+		return
+	}
 	
+	log.Println("Num of profiles found:", len(profiles))
+
+	if err := search.SaveProfiles(profiles, "profiles.json"); err != nil {
+		log.Println("Failed to save profiles:", err)
+	}
 }
