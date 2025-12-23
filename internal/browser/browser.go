@@ -7,7 +7,7 @@ import (
 )
 
 func LaunchBrowser() (*rod.Browser, error) {
-	log.Println("Launching Rod-managed Chromium (headless, no sandbox)")
+	log.Println("Launching Rod-managed Chromium (no sandbox)")
 
 	u := launcher.New().
 		Headless(false).
