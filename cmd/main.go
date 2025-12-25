@@ -40,6 +40,8 @@ func main() {
 		log.Println("✔", c)
 	}
 
+	stealth.ApplyFingerprintMask(page)
+
 	if !auth.LoadCookies(page) {
 		log.Println("No cookies found, logging in")
 		if err := auth.Login(page); err != nil {
