@@ -36,6 +36,9 @@ func main() {
 		search.SaveProfiles(profiles, "profiles_mock.json")
 		return
 	}
+	for _, c := range meta.Capabilities {
+		log.Println("✔", c)
+	}
 
 	if !auth.LoadCookies(page) {
 		log.Println("No cookies found, logging in")
