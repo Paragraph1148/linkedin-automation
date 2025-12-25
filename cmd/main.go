@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
 	"github.com/joho/godotenv"
 	"github.com/paragraph1148/linkedin-automation/internal/auth"
@@ -11,6 +12,8 @@ import (
 
 func main() {
 	_ = godotenv.Load()
+
+	useMock := os.Getenv("USE_MOCK") == "1"
 
 	b, err := browser.LaunchBrowser()
 	if err != nil {

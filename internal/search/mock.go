@@ -1,6 +1,7 @@
 package search
 
 import (
+	"net/url"
 	"os"
 	"github.com/go-rod/rod"
 )
@@ -10,6 +11,8 @@ func LoadMockHTML(page *rod.Page, path string) error {
 	if err != nil {
 		return err
 	}
-	page.MustSetContent(string(html))
+	dataURL := "data:text/html," + url.PathEscape(string(html))
+	page.MustNavigate(dataURL)
+	page.MustWaitLoad()
 	return nil
 }

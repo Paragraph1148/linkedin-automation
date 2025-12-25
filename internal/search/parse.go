@@ -27,11 +27,11 @@ func ExtractProfileURLs(page *rod.Page) ([]string, error) {
 			}
 		}
 	}
-	return nil
+	return profiles, nil
 }
 
 func isProfileURL(u string) bool {
-	return string.Contains(u, "/in/")
+	return strings.Contains(u, "/in/")
 }
 
 func cleanURL(u string) string {
