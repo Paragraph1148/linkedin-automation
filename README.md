@@ -1,3 +1,5 @@
+Video: demo/final.mp4
+
 # LinkedIn Automation Assignment (Educational Proof of Concept)
 
 IMPORTANT DISCLAIMER  
