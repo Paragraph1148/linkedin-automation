@@ -33,19 +33,33 @@ The project intentionally prioritizes:
 
 ## Architecture Overview
 
-cmd/
-└── main.go Entry point and orchestration
+The project follows a modular, package-based architecture with clear separation of concerns:
 
-internal/
-├── auth/ Authentication, cookies, guards, checkpoints
-├── browser/ Browser launch and fingerprint setup
-├── stealth/ Human-like behavior and anti-detection logic
-├── search/ Profile search and parsing (real and mock)
-├── messaging/ Mocked messaging workflow and state tracking
-├── config/ Configuration loading and validation
-└── meta/ Capability descriptions
+- cmd/main.go  
+  Entry point responsible for orchestration, configuration loading, and execution flow.
 
-Each package follows single-responsibility principles with explicit boundaries.
+- internal/auth  
+  Handles authentication, session cookies, authentication guards, and checkpoint detection.
+
+- internal/browser  
+  Responsible for browser launch configuration and fingerprint setup.
+
+- internal/stealth  
+  Implements human-like behavior simulation, timing control, mouse movement, scrolling, and rate limiting.
+
+- internal/search  
+  Handles profile search, pagination, parsing, deduplication, and mock HTML parsing.
+
+- internal/messaging  
+  Implements a mocked messaging workflow with persistent state tracking.
+
+- internal/config  
+  Loads and validates configuration from YAML and environment variables.
+
+- internal/meta  
+  Contains capability metadata used for demonstration and logging.
+
+Each package follows single-responsibility principles with explicit and well-defined boundaries.
 
 ---
 
