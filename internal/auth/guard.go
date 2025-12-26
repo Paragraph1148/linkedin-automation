@@ -14,7 +14,7 @@ func EnsureAuthenticated(page *rod.Page) error {
 	}
 
 	if strings.Contains(url, "checkpoint") || strings.Contains(url, "challenge") {
-		return errors.New("authentication checkpoint detected")
+		return ErrCheckpoint
 	}
 
 	return nil

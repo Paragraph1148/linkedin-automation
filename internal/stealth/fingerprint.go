@@ -2,7 +2,6 @@ package stealth
 
 import (
 	"fmt"
-
 	"github.com/go-rod/rod"
 )
 
@@ -40,6 +39,8 @@ func ApplyFingerprint(page *rod.Page, fp FingerprintProfile) error {
 		};
 	`, fp.Languages, fp.Platform, fp.HardwareC, fp.Plugins, fp.WebGLVend, fp.WebGLRend)
 
-	_, err := page.Evaluate(script)
+	_, err := page.Evaluate(&rod.EvalOptions{
+		JS: script,
+	})
 	return err
 }

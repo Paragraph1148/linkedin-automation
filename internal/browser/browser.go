@@ -2,7 +2,7 @@ package browser
 
 import (
 	"log"
-	"math/rand"
+	"fmt"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
@@ -14,6 +14,8 @@ func LaunchBrowser() (*rod.Browser, stealth.FingerprintProfile, error) {
 	u := launcher.New().
 		Headless(false).
 		NoSandbox(true).
+		Set("ozone-platform", "wayland").
+		Set("enable-features", "UseOzonePlatform").
 		Set("user-agent", fp.UserAgent).
 		Set("window-size", 
 			fmt.Sprintf("%d,%d", fp.Width, fp.Height),

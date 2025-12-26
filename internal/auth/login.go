@@ -14,6 +14,7 @@ import (
 func Login(page *rod.Page, cfg *config.Config) error {
 	email := os.Getenv("LINKEDIN_EMAIL")
 	password := os.Getenv("LINKEDIN_PASSWORD")
+	var ErrCheckpoint = errors.New("linkedin checkpoint detected")
 
 	if email == "" || password == "" {
 		return errors.New("missing LINKEDIN_EMAIL or LINKEDIN_PASSWORD")
@@ -56,7 +57,7 @@ func Login(page *rod.Page, cfg *config.Config) error {
 	log.Println("Post-login URL:", url)
 
 	if strings.Contains(url, "checkpoint") || strings.Contains(url, "challenge") {
-		return errors.New("linkedin security checkpoint detected")
+		return ErrCheckpoint
 	}
 
 	return nil

@@ -3,52 +3,32 @@ package stealth
 import (
 	"math/rand"
 	"time"
-
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 func HumanClick(page *rod.Page, el *rod.Element) error {
-	box, err := el.Box()
+	shape, err := el.Shape()
 	if err != nil {
 		return err
 	}
 
-	// Target is NOT center — humans don't aim perfectly
-	target := Point{
-		X: box.X + box.Width*(0.3+rand.Float64()*0.4),
-		Y: box.Y + box.Height*(0.3+rand.Float64()*0.4),
-	}
+	box := shape.Box()
 
-	// Start position (cursor "somewhere")
-	start := Point{
-		X: rand.Float64()*300 + 100,
-		Y: rand.Float64()*300 + 100,
-	}
+	targetX := box.X + box.Width*(0.3+rand.Float64()*0.4)
+	targetY := box.Y + box.Height*(0.3+rand.Float64()*0.4)
 
-	// Overshoot slightly
-	overshoot := Point{
-		X: target.X + rand.Float64()*10 - 5,
-		Y: target.Y + rand.Float64()*10 - 5,
-	}
+	startX := rand.Float64()*300 + 100
+	startY := rand.Float64()*300 + 100
 
-	// Move → overshoot → correction
-	moveBezier(page, start, overshoot)
-	time.Sleep(time.Duration(rand.Intn(120)+60) * time.Millisecond)
-	moveBezier(page, overshoot, target)
+	// Move mouse like a human
+	page.Mouse.MoveTo(proto.Point{X: startX, Y: startY})
+	time.Sleep(50 * time.Millisecond)
 
-	// Pre-click hesitation
+	page.Mouse.MoveTo(proto.Point{X: targetX, Y: targetY})
 	time.Sleep(time.Duration(rand.Intn(150)+80) * time.Millisecond)
 
-	page.Mouse.Click("left")
-
-	// Post-click micro jitter (optional realism)
-	if rand.Float64() < 0.3 {
-		page.Mouse.Move(
-			target.X+rand.Float64()*3,
-			target.Y+rand.Float64()*3,
-			1,
-		)
-	}
+	page.Mouse.Click(proto.InputMouseButtonLeft, 1)
 
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 type Point struct {
@@ -12,7 +13,6 @@ type Point struct {
 	Y float64
 }
 
-// Move mouse using quadratic Bézier curve
 func moveBezier(page *rod.Page, from, to Point) {
 	steps := rand.Intn(20) + 25
 
@@ -32,7 +32,7 @@ func moveBezier(page *rod.Page, from, to Point) {
 			2*(1-t)*t*ctrl.Y +
 			math.Pow(t, 2)*to.Y
 
-		page.Mouse.Move(x, y, 1)
+		page.Mouse.MoveTo(proto.Point{X: x, Y: y})
 		time.Sleep(time.Duration(rand.Intn(12)+5) * time.Millisecond)
 	}
 }

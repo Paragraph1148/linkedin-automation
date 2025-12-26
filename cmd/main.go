@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 	"github.com/joho/godotenv"
-	"github.com/paragraph1148/linkedin-automation/internal/messaging"
 	"github.com/paragraph1148/linkedin-automation/internal/auth"
 	"github.com/paragraph1148/linkedin-automation/internal/browser"
 	"github.com/paragraph1148/linkedin-automation/internal/config"
 	"github.com/paragraph1148/linkedin-automation/internal/meta"
+	"github.com/paragraph1148/linkedin-automation/internal/messaging"
 	"github.com/paragraph1148/linkedin-automation/internal/search"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
@@ -18,10 +18,8 @@ func main() {
 
 	useMock := os.Getenv("USE_MOCK") == "1"
 
-	// Load config
 	cfg := config.Load("config.yaml")
 
-	// Launch browser with fingerprint
 	browserInstance, fp, err := browser.LaunchBrowser()
 	if err != nil {
 		log.Fatal(err)
@@ -30,12 +28,11 @@ func main() {
 
 	page := browserInstance.MustPage()
 
-	// Apply fingerprint JS overrides
 	if err := stealth.ApplyFingerprint(page, fp); err != nil {
 		log.Println("fingerprint apply failed:", err)
 	}
 
-	// ---- MOCK MODE ----
+	// ---- MOCK MODE (explicit) ----
 	if useMock {
 		log.Println("Running in mock mode")
 
@@ -53,23 +50,41 @@ func main() {
 		return
 	}
 
-	// Print capabilities (demo-friendly)
 	for _, c := range meta.Capabilities {
 		log.Println("✔", c)
 	}
 
-	// Load cookies or login
+	// ---- AUTH ----
 	if !auth.LoadCookies(page) {
 		log.Println("No cookies found, logging in")
+
 		if err := auth.Login(page, cfg); err != nil {
+			if err == auth.ErrCheckpoint {
+				log.Println("Checkpoint detected — switching to mock mode")
+
+				if err := search.LoadMockHTML(page, "testdata/search_mock.html"); err != nil {
+					log.Fatal(err)
+				}
+
+				profiles, err := search.ExtractProfileURLs(page)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				log.Println("Mock profiles found:", len(profiles))
+				_ = search.SaveProfiles(profiles, "profiles_mock.json")
+				return
+			}
+
 			log.Fatal(err)
 		}
+
 		auth.SaveCookies(page)
 	} else {
 		log.Println("Loaded cookies, skipping login")
 	}
 
-	// Verify authentication
+	// ---- AUTH GUARD ----
 	page.MustNavigate("https://www.linkedin.com/feed")
 	page.MustWaitLoad()
 
@@ -111,5 +126,4 @@ func main() {
 	if err := messaging.RunMessagingFlow(profiles); err != nil {
 		log.Println("Messaging flow failed:", err)
 	}
-
 }
