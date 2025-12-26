@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
 	"github.com/go-rod/rod"
 	"github.com/paragraph1148/linkedin-automation/internal/config"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"

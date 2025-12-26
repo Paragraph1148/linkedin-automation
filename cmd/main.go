@@ -3,9 +3,8 @@ package main
 import (
 	"log"
 	"os"
-
 	"github.com/joho/godotenv"
-
+	"github.com/paragraph1148/linkedin-automation/internal/messaging"
 	"github.com/paragraph1148/linkedin-automation/internal/auth"
 	"github.com/paragraph1148/linkedin-automation/internal/browser"
 	"github.com/paragraph1148/linkedin-automation/internal/config"
@@ -108,4 +107,9 @@ func main() {
 	if err := search.SaveProfiles(profiles, "profiles.json"); err != nil {
 		log.Println("Failed to save profiles:", err)
 	}
+
+	if err := messaging.RunMessagingFlow(profiles); err != nil {
+		log.Println("Messaging flow failed:", err)
+	}
+
 }
