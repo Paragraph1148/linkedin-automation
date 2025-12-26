@@ -1,4 +1,7 @@
-Video: demo/final.mp4
+## Demonstration Video
+
+Video link:
+https://github.com/paragraph1148/linkedin-automation/blob/main/demo/final.mp4
 
 # LinkedIn Automation Assignment (Educational Proof of Concept)
 
