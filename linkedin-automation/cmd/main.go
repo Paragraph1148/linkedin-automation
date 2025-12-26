@@ -1,0 +1,129 @@
+package main
+
+import (
+	"log"
+	"os"
+	"github.com/joho/godotenv"
+	"github.com/paragraph1148/linkedin-automation/internal/auth"
+	"github.com/paragraph1148/linkedin-automation/internal/browser"
+	"github.com/paragraph1148/linkedin-automation/internal/config"
+	"github.com/paragraph1148/linkedin-automation/internal/meta"
+	"github.com/paragraph1148/linkedin-automation/internal/messaging"
+	"github.com/paragraph1148/linkedin-automation/internal/search"
+	"github.com/paragraph1148/linkedin-automation/internal/stealth"
+)
+
+func main() {
+	_ = godotenv.Load()
+
+	useMock := os.Getenv("USE_MOCK") == "1"
+
+	cfg := config.Load("config.yaml")
+
+	browserInstance, fp, err := browser.LaunchBrowser()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer browserInstance.Close()
+
+	page := browserInstance.MustPage()
+
+	if err := stealth.ApplyFingerprint(page, fp); err != nil {
+		log.Println("fingerprint apply failed:", err)
+	}
+
+	// ---- MOCK MODE (explicit) ----
+	if useMock {
+		log.Println("Running in mock mode")
+
+		if err := search.LoadMockHTML(page, "testdata/search_mock.html"); err != nil {
+			log.Fatal(err)
+		}
+
+		profiles, err := search.ExtractProfileURLs(page)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Mock profiles found:", len(profiles))
+		_ = search.SaveProfiles(profiles, "profiles_mock.json")
+		return
+	}
+
+	for _, c := range meta.Capabilities {
+		log.Println("✔", c)
+	}
+
+	// ---- AUTH ----
+	if !auth.LoadCookies(page) {
+		log.Println("No cookies found, logging in")
+
+		if err := auth.Login(page, cfg); err != nil {
+			if err == auth.ErrCheckpoint {
+				log.Println("Checkpoint detected — switching to mock mode")
+
+				if err := search.LoadMockHTML(page, "testdata/search_mock.html"); err != nil {
+					log.Fatal(err)
+				}
+
+				profiles, err := search.ExtractProfileURLs(page)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				log.Println("Mock profiles found:", len(profiles))
+				_ = search.SaveProfiles(profiles, "profiles_mock.json")
+				return
+			}
+
+			log.Fatal(err)
+		}
+
+		auth.SaveCookies(page)
+	} else {
+		log.Println("Loaded cookies, skipping login")
+	}
+
+	// ---- AUTH GUARD ----
+	page.MustNavigate("https://www.linkedin.com/feed")
+	page.MustWaitLoad()
+
+	if err := auth.EnsureAuthenticated(page); err != nil {
+		log.Println("Auth guard triggered:", err)
+		page.MustScreenshot("after_login.png")
+		return
+	}
+
+	// ---- SEARCH ----
+	query := search.SearchQuery{
+		Keywords: "Software Engineer",
+		Page:     0,
+	}
+
+	log.Println("Navigating to search:", query.URL())
+
+	if err := stealth.HumanAction(page, nil, cfg, func() error {
+		page.MustNavigate(query.URL())
+		page.MustWaitLoad()
+		return nil
+	}); err != nil {
+		log.Println("Navigation blocked:", err)
+		return
+	}
+
+	profiles, err := search.ExtractProfileURLs(page)
+	if err != nil {
+		log.Println("Profile extraction failed:", err)
+		return
+	}
+
+	log.Println("Profiles found:", len(profiles))
+
+	if err := search.SaveProfiles(profiles, "profiles.json"); err != nil {
+		log.Println("Failed to save profiles:", err)
+	}
+
+	if err := messaging.RunMessagingFlow(profiles); err != nil {
+		log.Println("Messaging flow failed:", err)
+	}
+}
