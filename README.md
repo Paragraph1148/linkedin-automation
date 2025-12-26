@@ -35,29 +35,56 @@ The project intentionally prioritizes:
 
 The project follows a modular, package-based architecture with clear separation of concerns:
 
-- cmd/main.go  
-  Entry point responsible for orchestration, configuration loading, and execution flow.
-
-- internal/auth  
-  Handles authentication, session cookies, authentication guards, and checkpoint detection.
-
-- internal/browser  
-  Responsible for browser launch configuration and fingerprint setup.
-
-- internal/stealth  
-  Implements human-like behavior simulation, timing control, mouse movement, scrolling, and rate limiting.
-
-- internal/search  
-  Handles profile search, pagination, parsing, deduplication, and mock HTML parsing.
-
-- internal/messaging  
-  Implements a mocked messaging workflow with persistent state tracking.
-
-- internal/config  
-  Loads and validates configuration from YAML and environment variables.
-
-- internal/meta  
-  Contains capability metadata used for demonstration and logging.
+├── cmd
+│   └── main.go
+├── config
+├── config.yaml
+├── go.mod
+├── go.sum
+├── internal
+│   ├── actions
+│   ├── auth
+│   │   ├── cookies.go
+│   │   ├── errors.go
+│   │   ├── guard.go
+│   │   └── login.go
+│   ├── browser
+│   │   ├── browser.go
+│   │   └── logger.go
+│   ├── config
+│   │   └── config.go
+│   ├── logger
+│   │   └── logger.go
+│   ├── messaging
+│   │   ├── detector.go
+│   │   ├── sender.go
+│   │   ├── state.go
+│   │   ├── templates.go
+│   │   └── workflow.go
+│   ├── meta
+│   │   └── capabilities.go
+│   ├── search
+│   │   ├── mock.go
+│   │   ├── parse.go
+│   │   ├── query.go
+│   │   ├── selftest.go
+│   │   └── store.go
+│   └── stealth
+│   ├── activity.go
+│   ├── click.go
+│   ├── fingerprint.go
+│   ├── hover.go
+│   ├── mouse.go
+│   ├── orchestrator.go
+│   ├── profile.go
+│   ├── rate.go
+│   ├── scroll.go
+│   ├── timing.go
+│   └── typing.go
+├── LICENSE
+├── README.md
+└── testdata
+└── search_mock.html
 
 Each package follows single-responsibility principles with explicit and well-defined boundaries.
 
