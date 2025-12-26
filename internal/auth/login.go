@@ -8,10 +8,11 @@ import (
 	"time"
 
 	"github.com/go-rod/rod"
+	"github.com/paragraph1148/linkedin-automation/internal/config"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
 
-func Login(page *rod.Page) error {
+func Login(page *rod.Page, cfg *config.Config) error {
 	email := os.Getenv("LINKEDIN_EMAIL")
 	password := os.Getenv("LINKEDIN_PASSWORD")
 
@@ -24,7 +25,7 @@ func Login(page *rod.Page) error {
 
 	// Email input
 	emailEl := page.MustElement(`input[name="session_key"]`)
-	if err := stealth.HumanAction(page, emailEl, func() error {
+	if err := stealth.HumanAction(page, emailEl, cfg, func() error {
 		stealth.HumanType(emailEl, email)
 		return nil
 	}); err != nil {
@@ -33,7 +34,7 @@ func Login(page *rod.Page) error {
 
 	// Password input
 	passwordEl := page.MustElement(`input[name="session_password"]`)
-	if err := stealth.HumanAction(page, passwordEl, func() error {
+	if err := stealth.HumanAction(page, passwordEl, cfg, func() error {
 		stealth.HumanType(passwordEl, password)
 		return nil
 	}); err != nil {
@@ -42,7 +43,7 @@ func Login(page *rod.Page) error {
 
 	// Submit button
 	submitBtn := page.MustElement(`button[type="submit"]`)
-	if err := stealth.HumanAction(page, submitBtn, func() error {
+	if err := stealth.HumanAction(page, submitBtn, cfg, func() error {
 		return stealth.HumanClick(page, submitBtn)
 	}); err != nil {
 		return err

@@ -13,6 +13,7 @@ require (
 	github.com/ysmood/got v0.42.3 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.3.0

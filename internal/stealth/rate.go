@@ -1,38 +1,54 @@
 package stealth
 
 import (
-	"fmt"
+	"encoding/json"
 	"errors"
 	"os"
-	"strconv"
 	"time"
 )
 
-const dailyLimitFile = "daily_count.txt"
-const dailyLimit = 15
+const rateFile = "rate_state.json"
 
-func CanPerformAction() error {
-	today := time.Now().Format("2025-12-19")
+type rateState struct {
+	Date        string `json:"date"`
+	Hour        int    `json:"hour"`
+	DailyCount  int    `json:"daily_count"`
+	HourlyCount int    `json:"hourly_count"`
+}
 
-	data, _ := os.ReadFile(dailyLimitFile)
-	parts := string(data)
+func CanPerformAction(dailyLimit, hourlyLimit int) error {
+	now := time.Now()
+	today := now.Format("2006-01-02")
+	hour := now.Hour()
 
-	var savedDate(string)
-	var count int
+	state := rateState{}
+	data, _ := os.ReadFile(rateFile)
+	_ = json.Unmarshal(data, &state)
 
-	if parts != "" {
-		fmt.Sscanf(parts, "&s &d", &savedDate, &count)
+	// Reset daily
+	if state.Date != today {
+		state.Date = today
+		state.DailyCount = 0
 	}
 
-	if savedDate != today {
-		count = 0
+	// Reset hourly
+	if state.Hour != hour {
+		state.Hour = hour
+		state.HourlyCount = 0
 	}
 
-	if count >= dailyLimit {
-		return errors.New("daily action limit reached")
+	if state.DailyCount >= dailyLimit {
+		return errors.New("daily limit reached")
+	}
+	if state.HourlyCount >= hourlyLimit {
+		return errors.New("hourly limit reached")
 	}
 
-	count++
-	os.WriteFile(dailyLimitFile, []byte(today+" "+strconv.Itoa(count)), 0644)
+	state.DailyCount++
+	state.HourlyCount++
+
+	out, _ := json.MarshalIndent(state, "", " ")
+	_ = os.WriteFile(rateFile, out, 0644)
+
 	return nil
 }
