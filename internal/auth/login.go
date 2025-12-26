@@ -22,7 +22,10 @@ func Login(page *rod.Page) error {
 	page.MustWaitLoad()
 
 	emailEl := page.MustElement(`input[name="session_key"]`)
-	stealth.HumanType(emailEl, email)
+	stealth.HumanAction(page, func() error {
+		stealth.HumanType(emailEl, email)
+		return nil
+	})
 	stealth.RandomDelay(500, 1200)
 
 	passwordEl := page.MustElement(`input[name="session_password"]`)

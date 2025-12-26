@@ -15,13 +15,17 @@ func main() {
 
 	useMock := os.Getenv("USE_MOCK") == "1"
 
-	b, err := browser.LaunchBrowser()
+	b, fp, err := browser.LaunchBrowser()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer b.Close()
 
 	page := b.MustPage()
+
+	if err := stealth.ApplyFingerprint(page, fp); err != nil {
+		log.Println("fingerprint apply failed:", err)
+	}
 
 	if useMock {
 		log.Println("Running in mock mode")
@@ -67,11 +71,21 @@ func main() {
 	}
 	log.Println("Navigating to search URL:", query.URL())
 
-	page.MustNavigate(query.URL())
-	page.MustWaitLoad()
-	
-	stealth.RandomScroll(page)
-	stealth.RandomMouseMove(page)
+	err := stealth.HumanAction(page, func() error {
+		page.MustNavigate(query.URL())
+		page.MustWaitLoad()
+		return nil
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	profiles, err := stealth.HumanAction(page, func() error {
+		_, err := search.ExtractProfileURLs(page)
+		return err
+	})
+
 
 	profiles, err := search.ExtractProfileURLs(page)
 	if err != nil {
