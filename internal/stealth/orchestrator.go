@@ -1,35 +1,33 @@
 package stealth
 
 import (
-	"errors"
 	"math/rand"
 	"time"
+
 	"github.com/go-rod/rod"
 )
 
-// HumanAction wraps a real action with human-like behavior
-func HumanAction(page *rod.Page, action func() error) error {
-	if page == nil {
-		return errors.New("nil page")
-	}
-
-	// 1. Pre-action thinking time
+// HumanAction wraps a real browser action with realistic human behavior
+func HumanAction(page *rod.Page, el *rod.Element, action func() error) error {
+	// 1. Thinking / hesitation before acting
 	think()
 
-	// 2. Idle mouse wandering
-	idleMouse(page)
+	// 2. Hover target if present
+	if el != nil {
+		_ = HumanHover(page, el)
+	}
 
-	// 3. Light scroll before action
-	if rand.Float64() < 0.6 {
+	// 3. Optional scroll before action
+	if rand.Float64() < 0.5 {
 		RandomScroll(page)
 	}
 
-	// 4. Execute the real action
+	// 4. Execute real action
 	if err := action(); err != nil {
 		return err
 	}
 
-	// 5. Post-action pause (reaction time)
+	// 5. Reaction time after action
 	react()
 
 	return nil
@@ -40,14 +38,5 @@ func think() {
 }
 
 func react() {
-	time.Sleep(time.Duration(rand.Intn(800)+300) * time.Millisecond)
-}
-
-func idleMouse(page *rod.Page) {
-	// Move mouse slightly without purpose
-	x := rand.Float64()*300 + 200
-	y := rand.Float64()*200 + 200
-
-	page.Mouse.Move(x, y, 1)
-	time.Sleep(time.Duration(rand.Intn(200)+100) * time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(900)+300) * time.Millisecond)
 }

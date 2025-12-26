@@ -2,10 +2,11 @@ package auth
 
 import (
 	"errors"
-	"os"
-	"time"
 	"log"
+	"os"
 	"strings"
+	"time"
+
 	"github.com/go-rod/rod"
 	"github.com/paragraph1148/linkedin-automation/internal/stealth"
 )
@@ -17,33 +18,45 @@ func Login(page *rod.Page) error {
 	if email == "" || password == "" {
 		return errors.New("missing LINKEDIN_EMAIL or LINKEDIN_PASSWORD")
 	}
-	
+
 	page.MustNavigate("https://www.linkedin.com/login")
 	page.MustWaitLoad()
 
+	// Email input
 	emailEl := page.MustElement(`input[name="session_key"]`)
-	stealth.HumanAction(page, func() error {
+	if err := stealth.HumanAction(page, emailEl, func() error {
 		stealth.HumanType(emailEl, email)
 		return nil
-	})
-	stealth.RandomDelay(500, 1200)
+	}); err != nil {
+		return err
+	}
 
+	// Password input
 	passwordEl := page.MustElement(`input[name="session_password"]`)
-	stealth.HumanType(passwordEl, password)
-	stealth.RandomDelay(500, 1200)
+	if err := stealth.HumanAction(page, passwordEl, func() error {
+		stealth.HumanType(passwordEl, password)
+		return nil
+	}); err != nil {
+		return err
+	}
 
-	page.MustElement(`button[type="submit"]`).
-		MustClick()
+	// Submit button
+	submitBtn := page.MustElement(`button[type="submit"]`)
+	if err := stealth.HumanAction(page, submitBtn, func() error {
+		return stealth.HumanClick(page, submitBtn)
+	}); err != nil {
+		return err
+	}
+
 	page.Timeout(15 * time.Second).MustWaitLoad()
-	
+
 	page.MustScreenshot("after_login.png")
 
 	url := page.MustInfo().URL
 	log.Println("Post-login URL:", url)
 
 	if strings.Contains(url, "checkpoint") || strings.Contains(url, "challenge") {
-		log.Println("LinkedIn checkpoint detected - stopping automation")
-		return errors.New("checkpoint detected")
+		return errors.New("linkedin security checkpoint detected")
 	}
 
 	return nil
